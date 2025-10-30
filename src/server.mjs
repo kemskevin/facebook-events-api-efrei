@@ -1,15 +1,14 @@
 // Dependencies
-import express from 'express';
-import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
+import express from 'express';
 import helmet from 'helmet';
+import mongoose from 'mongoose';
 
 // Core
 import config from './config.mjs';
 import routes from './controllers/routes.mjs';
-
 const Server = class Server {
   constructor() {
     this.app = express();
@@ -70,6 +69,17 @@ const Server = class Server {
 
   routes() {
     new routes.Users(this.app, this.connect);
+    new routes.Groups(this.app, this.connect);
+    new routes.Albums(this.app, this.connect);
+    new routes.Carpool(this.app, this.connect);
+    new routes.Events(this.app, this.connect);
+    new routes.Messages(this.app, this.connect);
+    new routes.Polls(this.app, this.connect);
+    new routes.PollVotes(this.app, this.connect);
+    new routes.ShoppingList(this.app, this.connect);
+    new routes.Threads(this.app, this.connect);
+    new routes.TicketOrders(this.app, this.connect);
+    new routes.TicketTypes(this.app, this.connect);
 
     this.app.use((req, res) => {
       res.status(404).json({

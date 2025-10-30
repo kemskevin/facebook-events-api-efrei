@@ -1,24 +1,31 @@
 import mongoose from 'mongoose';
 
-const Schema = new mongoose.Schema({
-  firstname: String,
-  lastname: String,
-  avatar: String,
-  age: Number,
-  city: String
-}, {
-  collection: 'users',
-  minimize: false,
-  versionKey: false
-}).set('toJSON', {
-  transform: (doc, ret) => {
-    const retUpdated = ret;
-    retUpdated.id = ret._id;
+const { Schema } = mongoose;
 
-    delete retUpdated._id;
+const userSchema = new Schema(
+  {
+    firstname: { type: String, required: true, trim: true },
+    lastname: { type: String, required: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Email invalide']
+    },
+    password_hash: { type: String, required: true },
+    avatarurl: { type: String, default: '' },
+    roles: {
+      type: [String],
+      default: ['user'],
+      enum: ['user', 'admin']
+    },
+    createdat: { type: Date, default: Date.now }
+  },
+  { timestamps: false }
+);
 
-    return retUpdated;
-  }
-});
+userSchema.index({ email: 1 }, { unique: true });
 
-export default Schema;
+export default userSchema;

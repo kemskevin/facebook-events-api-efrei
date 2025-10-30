@@ -1,82 +1,99 @@
-import UserModel from '../models/user.mjs';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import UserSchema from '../models/user.mjs';
 
 const Users = class Users {
   constructor(app, connect) {
     this.app = app;
-    this.UserModel = connect.model('User', UserModel);
-
+    this.UserModel = connect.model('User', UserSchema);
     this.run();
   }
 
-  deleteById() {
-    this.app.delete('/user/:id', (req, res) => {
+  create() {
+    this.app.post('/users', async (req, res) => {
       try {
-        this.UserModel.findByIdAndDelete(req.params.id).then((user) => {
-          res.status(200).json(user || {});
-        }).catch(() => {
-          res.status(500).json({
-            code: 500,
-            message: 'Internal Server error'
-          });
-        });
-      } catch (err) {
-        console.error(`[ERROR] users/:id -> ${err}`);
+        const {
+          firstname,
+          lastname,
+          email,
+          password
+        } = req.body;
 
-        res.status(400).json({
-          code: 400,
-          message: 'Bad request'
+        if (!email || !password) {
+          return res.status(400).json({ message: 'Email et mot de passe requis' });
+        }
+
+        const existing = await this.UserModel.findOne({ email });
+        if (existing) {
+          return res.status(409).json({ message: 'Cet email est déjà utilisé.' });
+        }
+
+        const hash = await bcrypt.hash(password, 10);
+        const user = new this.UserModel({
+          firstname,
+          lastname,
+          email,
+          password_hash: hash
         });
+
+        await user.save();
+        return res.status(201).json(user);
+      } catch (err) {
+        console.error(`[ERROR] POST /users -> ${err}`);
+        return res.status(500).json({ message: 'Erreur interne du serveur' });
+      }
+    });
+  }
+
+  login() {
+    this.app.post('/auth/login', async (req, res) => {
+      try {
+        const { email, password } = req.body;
+
+        const user = await this.UserModel.findOne({ email });
+        if (!user) {
+          return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        const valid = await bcrypt.compare(password, user.password_hash);
+        if (!valid) {
+          return res.status(401).json({ message: 'Mot de passe incorrect.' });
+        }
+
+        const token = jwt.sign(
+          { id: user._id, email: user.email },
+          process.env.JWT_SECRET || 'secret123',
+          { expiresIn: '2h' }
+        );
+
+        return res.status(200).json({ token, user });
+      } catch (err) {
+        console.error(`[ERROR] POST /auth/login -> ${err}`);
+        return res.status(500).json({ message: 'Erreur interne du serveur' });
       }
     });
   }
 
   showById() {
-    this.app.get('/user/:id', (req, res) => {
+    this.app.get('/users/:id', async (req, res) => {
       try {
-        this.UserModel.findById(req.params.id).then((user) => {
-          res.status(200).json(user || {});
-        }).catch(() => {
-          res.status(500).json({
-            code: 500,
-            message: 'Internal Server error'
-          });
-        });
+        const user = await this.UserModel.findById(req.params.id).select('-password_hash');
+        if (!user) {
+          return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+        }
+
+        return res.status(200).json(user);
       } catch (err) {
-        console.error(`[ERROR] users/:id -> ${err}`);
-
-        res.status(400).json({
-          code: 400,
-          message: 'Bad request'
-        });
-      }
-    });
-  }
-
-  create() {
-    this.app.post('/user/', (req, res) => {
-      try {
-        const userModel = new this.UserModel(req.body);
-
-        userModel.save().then((user) => {
-          res.status(200).json(user || {});
-        }).catch(() => {
-          res.status(200).json({});
-        });
-      } catch (err) {
-        console.error(`[ERROR] users/create -> ${err}`);
-
-        res.status(400).json({
-          code: 400,
-          message: 'Bad request'
-        });
+        console.error(`[ERROR] GET /users/:id -> ${err}`);
+        return res.status(500).json({ message: 'Erreur interne du serveur' });
       }
     });
   }
 
   run() {
     this.create();
+    this.login();
     this.showById();
-    this.deleteById();
   }
 };
 
