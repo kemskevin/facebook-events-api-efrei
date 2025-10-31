@@ -1,82 +1,109 @@
-# API Users
+# Facebook Events API
 
-## Overview
-The API allows users to retrieve all of the users of the application in micro service through a REST architecture. This API will be mainly used for registed Accounts.
+Voici le lien conduisant à la documentation de mon projet: **https://documenter.getpostman.com/view/49575970/2sB3Wny2uN**
 
-It will also create own users to recover data to the platform but is in no way related to the users collected via the crawling of profiles on Social Networks.
+> API REST complète permettant de gérer des **utilisateurs**, **groupes**, **événements**, **fils de discussion**, **albums photos**, **sondages** et **billetterie** pour un réseau social de type **Facebook Events** .
 
-### [POST] Create user
-Allows the creation of a single user.
+---
 
-|                            |                  |
-|----------------------------|------------------|
-| Requires authentication ?  | No               |
-| Who can use it ?           | Owner and users  |
-| Response formats           | application/json |
+## 🚀 Objectif du projet
 
-* HTTP request : POST → user/create
+Ce projet a été réalisé dans le cadre du cours **API & Web Services**.
+L’objectif est de concevoir et développer une API RESTful sécurisée, documentée et conforme aux bonnes pratiques professionnelles.
 
-#### Parameters :
-```javascript
-{
-  'firstname': String, // Optional
-  'lastname': Number, // Optional
-  'age': Number, // Optional
-  'city': String // Optional
-}
-```
+L’API permet à des utilisateurs de :
+- Créer et gérer des événements publics/privés
+- Créer ou rejoindre des groupes
+- Publier des messages et fils de discussion
+- Partager des albums et des photos
+- Créer et répondre à des sondages
+- Gérer une billetterie avec achat de billets en ligne
 
-#### Response :
-```javascript
-  {
-    id: Object_ID,
-    firstname: String,
-    lastname: String,
-    age: Number,
-    city: String
+---
+
+## Technologies utilisées
+
+| Outil / Librairie | Rôle |
+|--------------------|------|
+| **Node.js** | Environnement d’exécution |
+| **Express.js** | Framework web principal |
+| **Mongoose** | ORM pour MongoDB |
+| **MongoDB Atlas** | Base de données NoSQL |
+| **bcrypt** | Hashage des mots de passe |
+| **jsonwebtoken (JWT)** | Authentification sécurisée |
+| **helmet + cors + compression** | Sécurité & performance |
+| **swagger-ui-express** | Documentation interactive |
+| **Postman** | Tests manuels des endpoints |
+
+---
+
+## Architecture du projet
+
+api/
+├─ src/
+│   ├─ index.mjs              → Point d’entrée du serveur
+│   ├─ server.mjs             → Configuration Express & MongoDB
+│   ├─ config.mjs             → Configuration des environnements
+│   ├─ controllers/           → Logique métier et routes HTTP
+│   │   ├─ users.mjs
+│   │   ├─ groups.mjs
+│   │   ├─ events.mjs
+│   │   ├─ threads.mjs
+│   │   ├─ messages.mjs
+│   │   ├─ albums.mjs
+│   │   ├─ photos.mjs
+│   │   ├─ polls.mjs
+│   │   ├─ pollVotes.mjs
+│   │   ├─ ticketTypes.mjs
+│   │   ├─ ticketOrders.mjs
+│   │   └─ routes.mjs
+│   ├─ models/                → Schémas Mongoose
+│   │   ├─ user.mjs
+│   │   ├─ group.mjs
+│   │   ├─ event.mjs
+│   │   ├─ album.mjs
+│   │   ├─ photo.mjs
+│   │   ├─ poll.mjs
+│   │   ├─ pollVote.mjs
+│   │   ├─ ticketType.mjs
+│   │   └─ ticketOrder.mjs
+│   └─ docs/
+│       ├─postman_collection.json → Tests API Postman
+├─ package.json
+└─ README.md
+
+## Installation
+
+### Prérequis
+- Node.js ≥ 18
+- MongoDB Atlas ou local
+- npm ou yarn
+- Postman (pour les tests)
+
+### Étapes
+``bash
+# 1. Cloner le projet
+git clone https://github.com/<TON_USER>/facebook-events-api-efrei.git
+
+# 2. Se placer dans le dossier
+cd facebook-events-api-efrei/api
+
+# 3. Installer les dépendances
+npm install
+
+# 4. Lancer en mode développement
+npm run dev
+
+# ou en mode production
+npm run prod
+
+## Configuration
+
+Dans api/src/config.mjs, modifie la variable MongoDB :
+
+export default {
+  development: {
+    port: 3000,
+    mongodb: 'mongodb+srv://<user>:<password>@apicluster.vhyvsrb.mongodb.net/efrei'
   }
-```
-
-### [POST] Show user
-Show an user by id.
-
-|                            |                  |
-|----------------------------|------------------|
-| Requires authentication ?  | No               |
-| Who can use it ?           | Owner and users  |
-| Response formats           | application/json |
-
-* HTTP request : GET → user/show/:id
-
-#### Parameters :
-```javascript
-{
-  id: String // Required
-}
-```
-
-#### Response :
-```javascript
-  {
-    id: Object_ID,
-    firstname: String,
-    lastname: String,
-    age: Number,
-    city: String
-  }
-```
-
-### Requirements
-* node 18
-* npm or yarn or pnpm
-* git
-* mongodb (please configure config.js for link mongodb)
-
-### Install
-```npm i```
-
-### Production mode
-```npm run prod```
-
-### Dev mode
-```npm run dev```
+};

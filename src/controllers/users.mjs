@@ -9,6 +9,7 @@ const Users = class Users {
     this.run();
   }
 
+  // Créer un utilisateur
   create() {
     this.app.post('/users', async (req, res) => {
       try {
@@ -45,6 +46,7 @@ const Users = class Users {
     });
   }
 
+  // Connexion utilisateur
   login() {
     this.app.post('/auth/login', async (req, res) => {
       try {
@@ -74,6 +76,7 @@ const Users = class Users {
     });
   }
 
+  // Récupérer un utilisateur par ID
   showById() {
     this.app.get('/users/:id', async (req, res) => {
       try {
@@ -90,10 +93,24 @@ const Users = class Users {
     });
   }
 
+  // Récupérer tous les utilisateurs
+  getAll() {
+    this.app.get('/users', async (req, res) => {
+      try {
+        const users = await this.UserModel.find().select('-password_hash');
+        return res.status(200).json(users);
+      } catch (err) {
+        console.error(`[ERROR] GET /users -> ${err}`);
+        return res.status(500).json({ message: 'Erreur interne du serveur' });
+      }
+    });
+  }
+
   run() {
     this.create();
     this.login();
     this.showById();
+    this.getAll();
   }
 };
 

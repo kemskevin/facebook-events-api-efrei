@@ -4,7 +4,7 @@ const { Schema } = mongoose;
 
 const carpoolSchema = new Schema(
   {
-    departure_location: {
+    departurelocation: {
       type: String,
       required: true
     },
