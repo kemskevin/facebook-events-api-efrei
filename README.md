@@ -37,41 +37,6 @@ L’API permet à des utilisateurs de :
 
 ---
 
-## Architecture du projet
-
-api/
-├─ src/
-│   ├─ index.mjs              → Point d’entrée du serveur
-│   ├─ server.mjs             → Configuration Express & MongoDB
-│   ├─ config.mjs             → Configuration des environnements
-│   ├─ controllers/           → Logique métier et routes HTTP
-│   │   ├─ users.mjs
-│   │   ├─ groups.mjs
-│   │   ├─ events.mjs
-│   │   ├─ threads.mjs
-│   │   ├─ messages.mjs
-│   │   ├─ albums.mjs
-│   │   ├─ photos.mjs
-│   │   ├─ polls.mjs
-│   │   ├─ pollVotes.mjs
-│   │   ├─ ticketTypes.mjs
-│   │   ├─ ticketOrders.mjs
-│   │   └─ routes.mjs
-│   ├─ models/                → Schémas Mongoose
-│   │   ├─ user.mjs
-│   │   ├─ group.mjs
-│   │   ├─ event.mjs
-│   │   ├─ album.mjs
-│   │   ├─ photo.mjs
-│   │   ├─ poll.mjs
-│   │   ├─ pollVote.mjs
-│   │   ├─ ticketType.mjs
-│   │   └─ ticketOrder.mjs
-│   └─ docs/
-│       ├─postman_collection.json → Tests API Postman
-├─ package.json
-└─ README.md
-
 ## Installation
 
 ### Prérequis
